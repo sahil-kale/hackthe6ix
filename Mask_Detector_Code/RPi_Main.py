@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 from CV_API_Handler import *
 import time
 import cv2
+import numpy as np
 
 # initial & global declerations
 servo_pin = 19
@@ -48,10 +49,48 @@ def setServoError(cameraError, kCameraP):
     print(degreeCorrectionAngle)
 
 
+# Set array for validation of centering of camera
+stock_data = np.full(20, 100)
+
+
 def TakeScreenshot():
+    print('Taking Screenshot...')
     image_name = 'Picture.jpg'
     cv2.imwrite(image_name, frame)
     HandleImageAPI()
+
+# This function is used as a shift register to measure the last 20 measurements
+
+
+def shiftRegister(shift_array, insertion_number):
+    # Adds the number to the front of the list
+    shift_array.insert(0, insertion_number)
+    # Pops off the last number
+    shift_array.pop()
+    return shift_array
+
+# This function checks whether all the values fall within a range, this range needs to be calibrated
+
+
+def CenterCheck(array):
+    # If any items are outside of range, it will set detected to true
+    # Edit Lower And Upper Range Here
+    lower_range = -20
+    upper_range = 20
+
+    # Every time this function is called, set this param to False
+    NumOutOfRange = False
+
+    for item in array:
+        if item < lower_range or item > upper_range:
+            NumOutOfRange = True
+
+    # Checks to see if NumOutOfRange was set to True due to the outliar
+
+    if NumOutOfRange:
+        return False
+    else:
+        return True
 
 
 def updateCamera():
@@ -100,6 +139,12 @@ while True:
         cameraError = (xValue-kCameraMinRange) / \
             (kCameraMaxRange-kCameraMinRange)*200-100
         setServoError(cameraError, kServoCamConstant)
+
+        stock_data = shiftRegister(stock_data, cameraError)
+
+        # Check to see if the last 20 values are consistent
+        if(CenterCheck(stock_data)):
+            TakeScreenshot()
 
         print(cameraError)
 
