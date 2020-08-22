@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< Updated upstream
     package="risat.unmasked_app">
+=======
+    package="risat.unmasked">
+>>>>>>> Stashed changes
     <!-- Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->

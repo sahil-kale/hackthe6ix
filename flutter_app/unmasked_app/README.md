@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 # unmasked_app
+=======
+# unmasked
+>>>>>>> Stashed changes
 
 A new Flutter application.
 
