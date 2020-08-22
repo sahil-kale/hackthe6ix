@@ -4,6 +4,10 @@ import time
 import cv2
 import numpy as np
 
+
+# Set array for validation of centering of camera
+stock_data = np.full(20, 100)
+
 # initial & global declerations
 servo_pin = 19
 servo_freq = 50
@@ -16,7 +20,6 @@ currentServoDegree = 90
 def GPIOinit():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(servo_pin, GPIO.OUT)
-
 
 def setServoPosition(degrees):
     lowEndMs = 1
@@ -49,14 +52,10 @@ def setServoError(cameraError, kCameraP):
     print(degreeCorrectionAngle)
 
 
-# Set array for validation of centering of camera
-stock_data = np.full(20, 100)
-
-
-def TakeScreenshot():
+def TakeScreenshot(Originalframe):
     print('Taking Screenshot...')
     image_name = 'Picture.jpg'
-    cv2.imwrite(image_name, frame)
+    cv2.imwrite(image_name, Originalframe)
     HandleImageAPI()
 
 # This function is used as a shift register to measure the last 20 measurements
@@ -64,7 +63,7 @@ def TakeScreenshot():
 
 def shiftRegister(shift_array, insertion_number):
     # Adds the number to the front of the list
-    shift_array.insert(0, insertion_number)
+    shift_array = [insertion_number, shift_array]
     # Pops off the last number
     shift_array.pop()
     return shift_array
@@ -93,10 +92,10 @@ def CenterCheck(array):
         return True
 
 
-def updateCamera():
+def updateCamera(Originalframe):
     returnValue = -1
     scaleFactor = 0.4
-    ret, Originalframe = camera.read()
+    
 
     frame = cv2.resize(Originalframe, (0, 0), fx=scaleFactor, fy=scaleFactor)
 
@@ -128,7 +127,8 @@ servoPwm = GPIO.PWM(servo_pin, servo_freq)
 servoPwm.start(7.5)
 
 while True:
-    xValue = updateCamera()
+    ret, Originalframe = camera.read()
+    xValue = updateCamera(Originalframe)
     print(xValue)
 
     if(xValue != -1):
@@ -136,15 +136,14 @@ while True:
         kCameraMaxRange = 255
         kCameraMinRange = 0
 
-        cameraError = (xValue-kCameraMinRange) / \
-            (kCameraMaxRange-kCameraMinRange)*200-100
+        cameraError = (xValue-kCameraMinRange) / (kCameraMaxRange-kCameraMinRange)*200-100
         setServoError(cameraError, kServoCamConstant)
 
         stock_data = shiftRegister(stock_data, cameraError)
 
         # Check to see if the last 20 values are consistent
         if(CenterCheck(stock_data)):
-            TakeScreenshot()
+            TakeScreenshot(Originalframe)
 
         print(cameraError)
 
