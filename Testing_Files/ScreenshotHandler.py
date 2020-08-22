@@ -1,7 +1,7 @@
 #This program handles the screenshot taking and will run locally on a Raspberry Pi connected to the internet. It will take an image and send it over CV_API_Handler.py which connects to Microsoft Azure Services
 
 import cv2
-from CV_API_Handler import *
+
 
 # Create camera object linked to Video Capture
 camera = cv2.VideoCapture(0)
