@@ -4,10 +4,6 @@ import time
 import cv2
 import numpy as np
 
-
-# Set array for validation of centering of camera
-stock_data = np.full(20, 100)
-
 # initial & global declerations
 servo_pin = 19
 servo_freq = 50
@@ -20,6 +16,7 @@ currentServoDegree = 90
 def GPIOinit():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(servo_pin, GPIO.OUT)
+
 
 def setServoPosition(degrees):
     lowEndMs = 1
@@ -48,11 +45,15 @@ def setServoPosition(degrees):
 def setServoError(cameraError, kCameraP):
     degreeCorrectionAngle = cameraError * 0.9 * kCameraP
     setServoPosition(currentServoDegree-degreeCorrectionAngle)
-    print(currentServoDegree)
-    print(degreeCorrectionAngle)
+    #print(currentServoDegree)
+    #print(degreeCorrectionAngle)
 
 
-def TakeScreenshot(Originalframe):
+# Set array for validation of centering of camera
+stock_data = np.full(20, 100)
+
+
+def TakeScreenshot():
     print('Taking Screenshot...')
     image_name = 'Picture.jpg'
     cv2.imwrite(image_name, Originalframe)
@@ -65,7 +66,7 @@ def shiftRegister(shift_array, insertion_number):
     # Adds the number to the front of the list
     shift_array = [insertion_number, shift_array]
     # Pops off the last number
-    shift_array.pop()
+    del shift_array[-1]
     return shift_array
 
 # This function checks whether all the values fall within a range, this range needs to be calibrated
@@ -129,22 +130,24 @@ servoPwm.start(7.5)
 while True:
     ret, Originalframe = camera.read()
     xValue = updateCamera(Originalframe)
-    print(xValue)
+    #print(xValue)
 
     if(xValue != -1):
         kServoCamConstant = 0.05
         kCameraMaxRange = 255
         kCameraMinRange = 0
 
-        cameraError = (xValue-kCameraMinRange) / (kCameraMaxRange-kCameraMinRange)*200-100
+        cameraError = (xValue-kCameraMinRange)/(kCameraMaxRange-kCameraMinRange)*200-100
         setServoError(cameraError, kServoCamConstant)
 
         stock_data = shiftRegister(stock_data, cameraError)
 
         # Check to see if the last 20 values are consistent
         if(CenterCheck(stock_data)):
-            TakeScreenshot(Originalframe)
-
+            #TakeScreenshot()      
+            print("Screenshot Taken")
+        
+        print(stock_data)
         print(cameraError)
 
     key = cv2.waitKey(1)
