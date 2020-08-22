@@ -8,7 +8,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+<<<<<<< Updated upstream
 import 'package:unmasked_app/main.dart';
+=======
+import 'file:///C:/apps/hackthe6ix/flutter_app/unmasked/lib/home/main.dart';
+>>>>>>> Stashed changes
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
