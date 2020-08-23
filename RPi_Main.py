@@ -3,9 +3,24 @@ GPIO.setwarnings(False)
 from CV_API_Handler import *
 from ultrasonic import *
 from cardreader import *
+from firebaselogger import *
 import time
 import cv2
 import numpy as np
+
+
+# All the dependencies
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Use the application default credentials
+cred = credentials.Certificate("/home/pi/Desktop/Code/Hackathon/myapp-7ce88-firebase-adminsdk-ttzn8-91a855cee4.json")
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+
 
 # initial & global declerations
 servo_pin = 19
@@ -161,8 +176,9 @@ def updateCamera(Originalframe):
 
 def logEmployeeInteraction(led_pin):
     GPIO.output(led_pin, True)
-    scannedCard = readCard()
+    scannedCard = str(readCard())
     print(scannedCard)
+    LogTime(scannedCard.strip(), db)
     GPIO.output(led_pin, False)
     time.sleep(0.3)
     GPIO.output(led_pin, True)
