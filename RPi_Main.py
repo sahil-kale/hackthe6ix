@@ -21,7 +21,6 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-
 # initial & global declerations
 servo_pin = 19
 servo_freq = 50

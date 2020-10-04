@@ -38,8 +38,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+<<<<<<< Updated upstream
         applicationId "risat.unmasked_app"
         minSdkVersion 16
+=======
+        applicationId "risat.unmasked"
+        minSdkVersion 21
+>>>>>>> Stashed changes
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -61,3 +66,8 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+<<<<<<< Updated upstream
+=======
+
+apply plugin: 'com.google.gms.google-services'
+>>>>>>> Stashed changes
